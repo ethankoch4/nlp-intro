@@ -8,7 +8,7 @@ def get_bow_from_tokens(tokens, vocab):
     for token in tokens:
         bow[token] += 1
     return bow
-    
+
 def build_vocab(texts):
     '''build vocab dict from list of tokenized texts
     '''
@@ -17,29 +17,24 @@ def build_vocab(texts):
         for token in text:
             vocab.add(token)
     return vocab
-    
+
 def tokenize_text(text):
     '''tokenized an input text (str)
     '''
     tokenized = text.split()
     return tokenized
-    
-def build_bow_matrix(bows, vocab):
-    '''build Bag-of-Words matrix using BOW dicts for each text
-    '''
-    
-    
+
 def texts_to_tf_matrix(texts):
     '''from list of texts to a numpy array Term-Frequency matrix
     '''
-    vocab = build_vocab(texts)
+    vocab = build_vocab([tokenize_text(text) for text in texts])
     bows = []
-    
+
     for text in texts:
         tokenized_text = tokenize_text(text)
-        bow = get_bow_from_tokens(tokenized_text)
+        bow = get_bow_from_tokens(tokenized_text, vocab)
         bows.append(bow)
-    
+
     tf_matrix = np.zeros((len(bows), len(vocab)))
     for i, bow in enumerate(bows):
         for j, token in enumerate(vocab):
@@ -61,27 +56,27 @@ def get_sentiment_predictor(matrix, labels):
     model = LogisticRegression()
     model = model.fit(X=matrix, y=labels)
     return model
-    
-if __name__ == '__main__:
+
+if __name__ == '__main__':
     with open('../data/yelp_labels.csv', 'r') as f:
         labels = f.read().split(',,,,')
     with open('../data/yelp_sentences.csv', 'r') as f:
         texts = f.read().split(',,,,')
-    
+
     train_labels = labels[:100]
     test_labels = labels[-100:]
-    
-    
+
+
     tf_matrix = texts_to_tf_matrix(texts)
     train_tf = tf_matrix[:100]
     test_tf = tf_matrix[-100:]
     tf_sent_predictor = get_sentiment_predictor(train_tf, train_labels)
     tf_sent_accuracy = tf_sent_predictor.score(test_tf, test_labels)
     print('Performance using TF matrix: {0}'.format(round(tf_sent_accuracy, 4)))
-    
+
     tf_idf = tf_matrix_to_tf_idf(tf_matrix)
     train_tf_idf = tf_idf[:100]
     test_tf_idf = tf_idf[-100:]
     tf_idf_sent_predictor = get_sentiment_predictor(train_tf_idf, train_labels)
     tf_idf_sent_accuracy = tf_sent_predictor.score(test_tf_idf, test_labels)
-    print('Performance using TF-IDF matrix: {0}'.format(round(tf_idfsent_accuracy, 4)))
+    print('Performance using TF-IDF matrix: {0}'.format(round(tf_idf_sent_accuracy, 4)))
