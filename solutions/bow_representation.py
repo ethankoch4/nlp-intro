@@ -1,3 +1,5 @@
+import numpy as np
+
 
 def get_bow_from_tokens(tokens, vocab):
     '''get BOW representation for text using vocab
@@ -27,8 +29,8 @@ def build_bow_matrix(bows, vocab):
     '''
     
     
-def texts_to_bow_matrix(texts):
-    '''from list of texts to a numpy array Bag-of-Words matrix
+def texts_to_tf_matrix(texts):
+    '''from list of texts to a numpy array Term-Frequency matrix
     '''
     vocab = build_vocab(texts)
     bows = []
@@ -38,9 +40,34 @@ def texts_to_bow_matrix(texts):
         bow = get_bow_from_tokens(tokenized_text)
         bows.append(bow)
     
-    bow_matrix = np.zeros((len(bows), len(vocab)))
+    tf_matrix = np.zeros((len(bows), len(vocab)))
     for i, bow in enumerate(bows):
         for j, token in enumerate(vocab):
             if token in bow:
-                bow_matrix[i][j] = bow[token]
-    return bow_matrix
+                tf_matrix[i][j] = bow[token]
+    return tf_matrix
+
+def tf_matrix_to_tf_idf(tf_matrix):
+    '''get a tf-idf matrix from TF matrix
+    '''
+    column_sums = np.sum(tf_matrix, axis=0)
+    tf_idf_matrix = tf_matrix / column_sums
+    return tf_idf_matrix
+
+def get_sentiment_predictor(tf_idf, labels):
+    '''return model that can be used to predict sentiment
+    '''
+    from sklearn.linear_model import LogisticRegression
+    model = LogisticRegression()
+    model = model.fit(X=tf_idf, y=labels)
+    return model
+    
+if __name__ == '__main__:
+    with open('../data/yelp_labels.csv', 'r') as f:
+        labels = f.read().split(',,,,')
+    with open('../data/yelp_sentences.csv', 'r') as f:
+        texts = f.read().split(',,,,')
+    
+    
+    
+    
