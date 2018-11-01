@@ -54,12 +54,12 @@ def tf_matrix_to_tf_idf(tf_matrix):
     tf_idf_matrix = tf_matrix / column_sums
     return tf_idf_matrix
 
-def get_sentiment_predictor(tf_idf, labels):
+def get_sentiment_predictor(matrix, labels):
     '''return model that can be used to predict sentiment
     '''
     from sklearn.linear_model import LogisticRegression
     model = LogisticRegression()
-    model = model.fit(X=tf_idf, y=labels)
+    model = model.fit(X=matrix, y=labels)
     return model
     
 if __name__ == '__main__:
@@ -68,6 +68,20 @@ if __name__ == '__main__:
     with open('../data/yelp_sentences.csv', 'r') as f:
         texts = f.read().split(',,,,')
     
+    train_labels = labels[:100]
+    test_labels = labels[-100:]
     
     
+    tf_matrix = texts_to_tf_matrix(texts)
+    train_tf = tf_matrix[:100]
+    test_tf = tf_matrix[-100:]
+    tf_sent_predictor = get_sentiment_predictor(train_tf, train_labels)
+    tf_sent_accuracy = tf_sent_predictor.score(test_tf, test_labels)
+    print('Performance using TF matrix: {0}'.format(round(tf_sent_accuracy, 4)))
     
+    tf_idf = tf_matrix_to_tf_idf(tf_matrix)
+    train_tf_idf = tf_idf[:100]
+    test_tf_idf = tf_idf[-100:]
+    tf_idf_sent_predictor = get_sentiment_predictor(train_tf_idf, train_labels)
+    tf_idf_sent_accuracy = tf_sent_predictor.score(test_tf_idf, test_labels)
+    print('Performance using TF-IDF matrix: {0}'.format(round(tf_idfsent_accuracy, 4)))
