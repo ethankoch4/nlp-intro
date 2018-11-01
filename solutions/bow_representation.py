@@ -3,6 +3,13 @@ import numpy as np
 
 def get_bow_from_tokens(tokens, vocab):
     '''get BOW representation for text using vocab
+    
+    Arguments:
+        tokens (list): list of strings (tokens) from a text
+        vocab (set): all tokens in corpus
+    
+    Returns:
+        bag-of-words representation of tokens passed in
     '''
     bow = {token: 0 for token in vocab}
     for token in tokens:
@@ -11,6 +18,12 @@ def get_bow_from_tokens(tokens, vocab):
 
 def build_vocab(texts):
     '''build vocab dict from list of tokenized texts
+    
+    Arguments:
+        texts (list): list of lists of strings (tokens) from each text
+    
+    Returns:
+        set of each unique token in corpus
     '''
     vocab = set([])
     for text in texts:
@@ -20,12 +33,24 @@ def build_vocab(texts):
 
 def tokenize_text(text):
     '''tokenized an input text (str)
+    
+    Arguments:
+        text (str): one of the documents in the corpus
+    
+    Returns:
+        list of tokens (strings) in document
     '''
     tokenized = text.split()
     return tokenized
 
 def texts_to_tf_matrix(texts):
     '''from list of texts to a numpy array Term-Frequency matrix
+    
+    Arguments:
+        texts (list): list of strings that are the input texts
+    
+    Returns:
+        Term-Frequency matrix -- rows are texts, columns are words
     '''
     vocab = build_vocab([tokenize_text(text) for text in texts])
     bows = []
@@ -44,6 +69,12 @@ def texts_to_tf_matrix(texts):
 
 def tf_matrix_to_tf_idf(tf_matrix):
     '''get a tf-idf matrix from TF matrix
+    
+    Arguments:
+        tf_matrix (np.array): np.array that is a Term-Frequency matrix
+    
+    Returns:
+        Term-Frequency Inverse-Document matrix
     '''
     column_sums = np.sum(tf_matrix, axis=0)
     tf_idf_matrix = tf_matrix / column_sums
@@ -51,6 +82,13 @@ def tf_matrix_to_tf_idf(tf_matrix):
 
 def get_sentiment_predictor(matrix, labels):
     '''return model that can be used to predict sentiment
+    
+    Arguments:
+        matrix (np.array): (X) examples to train classifier on
+        labels (list): (Y) labels to train classifier on
+    
+    Returns:
+        sklearn.linear_model.LogisticRegression object that can be used to predict
     '''
     from sklearn.linear_model import LogisticRegression
     model = LogisticRegression()
