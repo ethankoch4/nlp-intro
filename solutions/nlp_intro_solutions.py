@@ -76,7 +76,7 @@ def tf_matrix_to_tf_idf(tf_matrix):
     Returns:
         Term-Frequency Inverse-Document matrix
     '''
-    column_sums = np.sum(tf_matrix, axis=0)
+    column_sums = np.count_nonzero(tf_matrix, axis=0)
     tf_idf_matrix = tf_matrix / column_sums
     return tf_idf_matrix
 
